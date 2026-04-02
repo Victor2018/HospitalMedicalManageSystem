@@ -1,0 +1,128 @@
+package com.goudan.view;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import com.goudan.data.User;
+import com.swtdesigner.SwingResourceManager;
+
+public class LoginFrame extends JFrame {
+
+	private JPasswordField passwordField;
+	private JTextField textField;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		LoginFrame lf = new LoginFrame();
+		lf.setBounds(100, 100, 380, 280);
+		lf.setVisible(true);
+		
+	}
+	public LoginFrame() {
+		super();
+		getContentPane().setLayout(null);
+
+		final JLabel label = new JLabel();
+		label.setIcon(SwingResourceManager.getIcon(LoginFrame.class, "/images/yonghumingx.jpg"));
+		label.setBounds(80, 90, 60, 21);
+		getContentPane().add(label);
+
+		final JLabel label_1 = new JLabel();
+		label_1.setIcon(SwingResourceManager.getIcon(LoginFrame.class, "/images/mimax.jpg"));
+		label_1.setBounds(80, 135, 60, 21);
+		getContentPane().add(label_1);
+
+		textField = new JTextField();
+		textField.setBounds(155, 90, 148, 21);
+		getContentPane().add(textField);
+
+		passwordField = new JPasswordField();
+		passwordField.setBounds(154, 135, 148, 21);
+		getContentPane().add(passwordField);
+
+		final JButton loginButton = new JButton();
+		loginButton.setIcon(SwingResourceManager.getIcon(LoginFrame.class, "/images/denglux.jpg"));
+		loginButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String name = textField.getText();
+				String pass = new String(passwordField.getPassword());
+				User user = new User();
+				user.setName(name);
+				user.setPass(pass);
+				user.setType(1);
+				try {
+					Socket socket = new Socket("localhost",9527);
+					ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+					ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+					
+					oos.writeObject(user);
+					Object res = ois.readObject();
+					if (res instanceof User) {
+						ChatFrame cf = new ChatFrame(socket,(User)res,ois,oos);
+						cf.setBounds(100, 100, 600, 480);
+						cf.setVisible(true);
+						LoginFrame.this.dispose();				
+						
+					} else {
+						JOptionPane.showMessageDialog(LoginFrame.this, res);
+						oos.close();
+						ois.close();
+						socket.close();
+					}
+				} catch (UnknownHostException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException ee) {
+					// TODO Auto-generated catch block
+					ee.printStackTrace();
+				}
+			}
+		});
+		loginButton.setBounds(44, 191, 79, 23);
+		getContentPane().add(loginButton);
+
+		final JButton button_1 = new JButton();
+		button_1.setIcon(SwingResourceManager.getIcon(LoginFrame.class, "/images/tuichux.jpg"));
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			
+		button_1.setBounds(253, 191, 79, 23);
+		getContentPane().add(button_1);
+
+		final JButton button = new JButton();
+		button.setIcon(SwingResourceManager.getIcon(LoginFrame.class, "/images/zhucex.jpg"));
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RegistFrame rf = new RegistFrame();
+				rf.setBounds(100, 100, 600, 480);
+				rf.setVisible(true);
+			}
+		});
+		button.setBounds(148, 191, 79, 23);
+		getContentPane().add(button);
+
+		final JLabel label_2 = new JLabel();
+		label_2.setIcon(SwingResourceManager.getIcon(LoginFrame.class, "/images/denglujiemian.jpg"));
+		label_2.setBounds(0, 0, 381, 243);
+		getContentPane().add(label_2);
+	}
+
+}

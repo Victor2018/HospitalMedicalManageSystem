@@ -1,0 +1,407 @@
+package com.goudan.view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import com.goudan.data.MessType;
+import com.goudan.data.Message;
+import com.goudan.data.User;
+
+public class ChatFrame extends JFrame {
+	private JList list;
+	private JTextField textField;
+	private JTextArea textArea;
+	private User user;
+	private Socket socket;
+	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
+	private DefaultListModel users = new DefaultListModel();
+	private boolean isRun = true;
+	private User toUser;
+	public ChatFrame(Socket socket,final User user,final ObjectInputStream ois,final ObjectOutputStream oos) {
+		super();
+
+		Toolkit tool = Toolkit.getDefaultToolkit();
+		Dimension d = tool.getScreenSize();
+		this.socket = socket;
+		this.user = user;
+		this.ois = ois;
+		this.oos = oos;
+		this.setTitle("哈哈聊天窗口"); //聊天窗口设置标题及图片
+		this.setIconImage(Toolkit.getDefaultToolkit().createImage("images\\liaotiantubiao.jpg"));
+		  this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			this.addWindowListener(new WindowListener(){
+
+				public void windowActivated(WindowEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void windowClosed(WindowEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void windowClosing(WindowEvent e) {
+					// TODO Auto-generated method stub
+					int res = JOptionPane.showConfirmDialog(null, "是否真的退出？");
+				
+					if (res == 0) {
+						isRun = false;
+						System.exit(0);
+					} else {
+						return ;
+					}
+
+
+					
+				}
+
+				public void windowDeactivated(WindowEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void windowDeiconified(WindowEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void windowIconified(WindowEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				public void windowOpened(WindowEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+		
+		
+		
+		textArea = new JTextArea();
+		textArea.setBackground(new Color(224, 255, 255));
+		getContentPane().add(textArea, BorderLayout.CENTER);
+
+		final JPanel panel = new JPanel();
+		panel.setBackground(new Color(144, 238, 144));
+		getContentPane().add(panel, BorderLayout.SOUTH);
+		
+		textField = new JTextField();
+		textField.setColumns(30);
+		panel.add(textField);
+		
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Message mess = new Message();
+				mess.setSendName(user.getName());
+				mess.setMessage(textField.getText());		
+				if (toUser == null) {
+					mess.setType(MessType.gongliao);
+				} else {
+					mess.setType(MessType.siliao);
+					mess.setToName(toUser.getName());
+				}
+				
+				try {
+					oos.writeObject(mess);
+					oos.flush();
+					textField.setText("");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		button.setText("发信息");
+		panel.add(button);
+
+		final JButton button_1 = new JButton();
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (toUser == null || toUser.getName().equals(user.getName())) {
+					JOptionPane.showMessageDialog(ChatFrame.this, "请选择一个用户");
+				} else {
+					
+					JFileChooser jfc = new JFileChooser(".");
+					int type = jfc.showOpenDialog(ChatFrame.this);
+					if (type == 0) {
+						Message mess = new Message();
+						mess.setType(MessType.siliao);
+						mess.setToName(toUser.getName());
+						mess.setSendName(user.getName());
+						InetAddress ia = null;
+						try {
+							ia = InetAddress.getLocalHost();
+						} catch (UnknownHostException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						mess.setIp(ia.getHostAddress());
+						int port = (int)(Math.random() * 64300 + 1024);
+						mess.setCode(port);
+						File file = jfc.getSelectedFile();
+						mess.setMessage(user.getName() + " 给你发文件,文件名：("+ file.getName() + "),文件大小：" + file.length() + "字节");
+						
+						try {
+							oos.writeObject(mess);
+							oos.flush();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						SendFile sf = new SendFile(port,file);
+						sf.start();
+						
+					}
+					
+				}
+			}
+		});
+		button_1.setText("发文件");
+		panel.add(button_1);
+
+		final JButton button_2 = new JButton();
+		button_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Message mess = new Message();
+				mess.setMessage("exit");
+				try {
+					oos.writeObject(mess);
+					isRun = false;
+					  int res = JOptionPane.showConfirmDialog(null, "是否真的退出？");
+					System.exit(0);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		button_2.setText("退出");
+		panel.add(button_2);
+		
+		users.addElement(user);
+		list = new JList(users);
+		list.setBackground(new Color(255, 182, 193));
+		list.setCellRenderer(new ListCellRenderer(){
+
+			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				// TODO Auto-generated method stub
+				User u = (User)value;
+				JLabel jl = new JLabel();
+				try {
+					jl.setIcon(new ImageIcon(u.getIcon()));
+				} catch (Exception e) {
+					jl.setIcon(new ImageIcon("images\\image10.png"));
+				}
+				
+				jl.setText(u.getName());
+				
+				if (isSelected) {
+					
+					 jl.setForeground(Color.red);
+		             setBackground(list.getSelectionBackground());
+		             setForeground(list.getSelectionForeground());
+		         } else {
+		             setBackground(list.getBackground());
+		             setForeground(list.getForeground());
+		         }
+		         setEnabled(list.isEnabled());
+		         setFont(list.getFont());
+		       
+				return jl;
+			}
+			
+		});
+		list.addListSelectionListener(new ListSelectionListener(){
+
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				toUser = (User)list.getSelectedValue();
+				list.setSelectedIndex(list.getSelectedIndex());
+			}
+			
+		});
+		getContentPane().add(list, BorderLayout.EAST);
+		
+		new Rece().start();
+	}
+	
+	
+	class Rece extends Thread {
+		public void run(){
+			while (isRun) {
+				try {
+					Object value = ois.readObject();
+				
+					 if ( value  instanceof Message) {
+						 Message mess = (Message)value;
+						 if (mess.getIp() == null)  {
+							 String allmess = "";
+							 allmess += "sender:" + mess.getSendName() + "\n";
+							 allmess += "to :" + mess.getToName() + "\n";
+							 allmess += mess.getMessage();
+							 textArea.append(allmess);
+						 } else {
+							 ReceFile rf = new ReceFile(mess);
+							 rf.start();
+						 }
+					 } else {
+						 User user = (User)value;
+						 if (user.getType() == 9) {
+							 users.removeElement(user);
+						 } else {
+							 if (!users.contains(value)) {
+								 users.addElement(value);
+						 
+							 }
+						 }
+							 
+					 }
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	class SendFile extends Thread{
+		private int port;
+		private File file;
+		public SendFile(int port,File file){
+			this.port = port;
+			this.file = file;
+		}
+		public void run(){
+			
+			try {
+				ServerSocket server = new ServerSocket(port);
+				Socket socket = server.accept();
+				InputStream is = socket.getInputStream();
+				OutputStream os = socket.getOutputStream();
+				FileInputStream fis = new FileInputStream(file);
+				int c = is.read();
+				if (c == 'a') {
+					byte[] buffer = new byte[102400];
+					int len = fis.read(buffer);
+					while (len != -1) {
+						os.write(buffer, 0, len);
+						os.flush();
+						len = fis.read(buffer);
+					}
+					os.close();
+					is.close();
+					socket.close();
+					server.close();
+					JOptionPane.showMessageDialog(ChatFrame.this, "文件发送完毕");
+				} else {
+					JOptionPane.showMessageDialog(ChatFrame.this, "对方拒绝接受文件");
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	class ReceFile extends Thread{
+		
+		private Message mess;
+		public ReceFile(Message mess) {
+			
+			this.mess = mess;
+		}
+		public void run(){
+			Socket socket = null;
+			try {
+				socket = new Socket(mess.getIp(),mess.getCode());
+			} catch (UnknownHostException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				InputStream is = socket.getInputStream();
+				OutputStream os = socket.getOutputStream();
+				int type = JOptionPane.showConfirmDialog(ChatFrame.this, mess.getMessage());
+				if (type == JOptionPane.YES_OPTION) {
+					os.write('a');
+					os.flush();
+					byte[] buffer = new byte[102400];
+					int len = is.read(buffer);
+					JFileChooser jfc = new JFileChooser(".");
+					File file  = new File(mess.getMessage().substring(mess.getMessage().indexOf('(') + 1, mess.getMessage().indexOf(')')));
+					jfc.setSelectedFile(file);
+					jfc.showSaveDialog(ChatFrame.this);
+					file = new File(jfc.getSelectedFile().getAbsolutePath());
+					FileOutputStream fos = new FileOutputStream(file);
+					while (len != -1) {
+						fos.write(buffer, 0, len);
+						fos.flush();
+						len = is.read(buffer);
+					}
+					
+					fos.close();
+					os.close();
+					is.close();
+					socket.close();
+					JOptionPane.showMessageDialog(ChatFrame.this, "文件接受完毕");
+				} else {
+					os.write('b');
+					os.flush();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+}

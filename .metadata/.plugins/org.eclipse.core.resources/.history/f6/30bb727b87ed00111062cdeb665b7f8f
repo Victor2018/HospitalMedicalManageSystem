@@ -1,0 +1,30 @@
+package com.goudan.ui;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class LoginTest extends JFrame {
+	public static void main(String[] a) {
+		LoginTest lt = new LoginTest();
+		lt.setBounds(100, 100, 400, 400);
+		lt.setVisible(true);
+		lt.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	public LoginTest() {
+		super();
+		getContentPane().setLayout(null);
+
+		final JLabel label = new JLabel();
+		label.setIcon(new ImageIcon("images\\mt_bg.jpg"));
+		label.setBounds(10, 0, 482, 341);
+		getContentPane().add(label);
+
+		final JButton button = new JButton();
+		button.setText("New JButton");
+		button.setBounds(113, 213, 99, 23);
+		getContentPane().add(button);
+	}
+
+}

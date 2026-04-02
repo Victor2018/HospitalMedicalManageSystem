@@ -1,0 +1,126 @@
+package com.goudan.app;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
+public class PipeApp {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		
+		try {
+			PipedInputStream pis1 = new PipedInputStream();
+			PipedOutputStream pos1 = new PipedOutputStream(pis1);
+			
+			
+			PipedInputStream pis2 = new PipedInputStream();
+			PipedOutputStream pos2 = new PipedOutputStream(pis2);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}
+
+class GetThread extends Thread {
+	private DataInputStream dis;
+	private boolean isRun = true;
+	public GetThread(InputStream is){
+		dis = new DataInputStream(is);
+	}
+	
+	public void run(){
+		while (isRun) {
+			try {
+				double d = dis.readDouble();
+				System.out.println("read:" + d);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class TranThread extends Thread{
+	private DataOutputStream dos;
+	private DataInputStream dis;
+	private boolean isRun = true;
+	public TranThread(InputStream is ,OutputStream os){
+		dos = new DataOutputStream(os);
+		is = new DataInputStream(is);
+	}
+	
+	public void run(){
+		while (isRun) {
+			try {
+				double d = dis.readDouble();
+				dos.writeDouble(d);
+				dos.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+
+	public boolean isRun() {
+		return isRun;
+	}
+
+	public void setRun(boolean isRun) {
+		this.isRun = isRun;
+	}
+	
+}
+class ChanThread extends Thread{
+	private OutputStream os;
+	private boolean isRun = false;
+	private DataOutputStream dos;
+	public ChanThread(OutputStream os) {
+		this.os = os;
+		isRun = true;
+		dos = new DataOutputStream(os);
+	}
+	
+	public void run() {
+		while (isRun) {
+			double d = Math.random();
+			
+			try {
+				dos.writeDouble(d);
+				dos.flush();
+				Thread.sleep(1);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public boolean isRun() {
+		return isRun;
+	}
+
+	public void setRun(boolean isRun) {
+		this.isRun = isRun;
+	}
+}
+
+
+

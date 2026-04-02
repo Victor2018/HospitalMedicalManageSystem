@@ -1,0 +1,113 @@
+package com.goudan.ui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class PaintTest extends JFrame {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		PaintTest pt = new PaintTest();
+		
+		pt.setVisible(true);
+		pt.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	public PaintTest() {
+		super();
+		setBounds(100, 100, 500, 500);
+		final Ball ball = new Ball(this.getSize());
+		final MyPanel panel = new MyPanel(ball);
+		
+		
+		getContentPane().add(panel, BorderLayout.CENTER);
+		panel.repaint();
+		
+		new Thread(){
+			public void run(){
+				for (int i =0; i < 100; i++) {
+					ball.move();
+					panel.repaint();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
+	}
+	
+	
+	class MyPanel extends JPanel{
+		
+		private Ball ball;
+		
+		public MyPanel(Ball ball){
+			this.ball = ball;
+		}
+		@Override
+		public void paintComponent(Graphics g) {
+			
+			
+			Graphics2D g2 = (Graphics2D)g;
+			g2.clearRect(0, 0, 500, 500);
+			g2.setColor(new Color(255,0,0));
+			g2.fillOval(ball.getX(),ball.getY(), ball.getRa(), ball.getRa());
+			
+		}
+	}
+	
+	class Ball {
+		private int x;
+		private int y;
+		private int dx = 5;
+		private int dy = 5;
+		private int dwidth =20;
+		private Dimension dim;
+		public Ball(Dimension d){
+			dim = d;
+		}
+		
+		public int getX(){
+			return x;
+		}
+		public int getY(){
+			return y;
+		}
+		public int getRa(){
+			return dwidth;
+		}
+		
+		public void move(){
+			x += dx;
+			y += dy;
+			
+			if (x + dwidth > dim.getWidth()) {
+				dx = -dx;
+			}
+			if (x < 0) {
+				dx = -dx;
+			}
+			if (y + dwidth > dim.getHeight()) {
+				dy = -dy;
+			}
+			if (x < 0) {
+				dy = -dy;
+			}
+		}
+		
+		
+	}
+}
+
+

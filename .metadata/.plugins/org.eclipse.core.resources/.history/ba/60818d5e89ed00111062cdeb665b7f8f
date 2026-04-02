@@ -1,0 +1,54 @@
+package com.goudan.ui;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class LoginTest extends JFrame {
+	public static void main(String[] a) {
+		LoginTest lt = new LoginTest();
+		lt.setBounds(100, 100, 400, 400);
+		lt.setVisible(true);
+		lt.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	public LoginTest() {
+		super();
+		getContentPane().setLayout(null);
+
+		final JLabel label = new JLabel();
+		label.setIcon(new ImageIcon("images\\mt_bg.jpg"));
+		label.setBounds(10, 0, 482, 341);
+		getContentPane().add(label);
+
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				JFileChooser jfc = new JFileChooser(".");
+				String fileName = "hello.java";
+				jfc.setSelectedFile(new File(fileName));
+				int type = jfc.showSaveDialog(LoginTest.this);
+				System.out.println("type:" + type);
+				if (type == 0) {
+					System.out.println(jfc.getSelectedFile().getAbsolutePath());
+				}
+				/*int type = jfc.showOpenDialog(LoginTest.this);
+				if (type == 0) {
+					System.out.println(jfc.getSelectedFile().getAbsolutePath());
+				}*/
+			}
+			
+		});
+		button.setText("New JButton");
+		button.setBounds(113, 213, 99, 23);
+		getContentPane().add(button);
+	}
+
+}

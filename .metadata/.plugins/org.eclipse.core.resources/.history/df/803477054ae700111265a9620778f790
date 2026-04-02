@@ -1,0 +1,61 @@
+package com.goudan.app;
+
+import java.io.IOException;
+
+import com.goudan.data.MyData;
+import com.goudan.thread.ThreadAdd;
+import com.goudan.thread.ThreadSub;
+
+public class ThreadApp {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		/*ThreadTwo o = new ThreadTwo("a");
+		ThreadTwo tw = new ThreadTwo("b");
+		ThreadTwo th = new ThreadTwo("c");
+		
+		Thread one = new Thread(o);
+		Thread two = new Thread(tw);
+		Thread three = new Thread(th);
+		
+		one.start();*/
+		/*try {
+			int k = System.in.read();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("--------------------------");*/
+	/*	two.start();
+		try {
+			two.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		three.start();
+		
+		for (int i = 0; i < 30; i++) {
+			System.out.println("d:" + i);
+		}*/
+		
+		/*for (int i = 0; i < 30; i++) {
+			System.out.println("c:" + i);
+		}*/
+		
+		MyData data = new MyData();
+		ThreadAdd aone = new ThreadAdd(data,"addone");
+		ThreadSub sone = new ThreadSub(data,"subone");
+		ThreadAdd atwo = new ThreadAdd(data,"addtwo");
+		ThreadSub stwo = new ThreadSub(data,"subtwo");
+		aone.start();
+		atwo.start();
+		sone.start();
+		stwo.start();
+	}
+
+}

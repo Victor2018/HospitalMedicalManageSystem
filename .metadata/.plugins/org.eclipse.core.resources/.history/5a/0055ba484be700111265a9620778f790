@@ -1,0 +1,32 @@
+package com.goudan.app;
+
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
+public class PipeApp {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		
+		try {
+			PipedInputStream pis1 = new PipedInputStream();
+			PipedOutputStream pos1 = new PipedOutputStream(pis1);
+			
+			
+			PipedInputStream pis2 = new PipedInputStream();
+			PipedOutputStream pos2 = new PipedOutputStream(pis2);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}
+
+

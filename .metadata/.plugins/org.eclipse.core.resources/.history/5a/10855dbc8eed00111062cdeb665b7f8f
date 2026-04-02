@@ -1,0 +1,43 @@
+package com.goudan.ui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class PaintTest extends JFrame {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		PaintTest pt = new PaintTest();
+		pt.setBounds(100, 100, 500, 500);
+		pt.setVisible(true);
+		pt.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	public PaintTest() {
+		super();
+
+		final MyPanel panel = new MyPanel();
+		
+		
+		getContentPane().add(panel, BorderLayout.CENTER);
+	}
+	
+	
+	class MyPanel extends JPanel{
+		public void paintComponents(Graphics g) {
+			System.out.println("paintComp");
+			Graphics2D g2 = (Graphics2D)g;
+			g2.setColor(new Color(255,0,0));
+			g2.drawArc(250, 250, 150, 150, 0, 360);
+		}
+	}
+}
+
+

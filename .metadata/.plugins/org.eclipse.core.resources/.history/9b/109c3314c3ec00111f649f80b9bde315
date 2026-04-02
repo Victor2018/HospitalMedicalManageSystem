@@ -1,0 +1,112 @@
+package com.goudan.ui;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataListener;
+
+import sun.misc.JavaLangAccess;
+
+public class ComTest extends JFrame {
+	
+	public static void main(String[] a) {
+		ComTest com = new ComTest();
+		com.setBounds(100, 100, 500, 400);
+		com.setVisible(true);
+		com.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	private JTextField textField;
+	private JList list;
+	public ComTest() {
+		super();
+		getContentPane().setLayout(null);
+		String[] data = {"one", "two", "three", "four", "two", "three", "four", "two", "three", "four", "two", "three", "four"};
+		final MyModel mm = new MyModel();
+		mm.addElement("aaaaaaaaa");
+		mm.addElement("bbbbb");
+		list = new JList(mm);
+		JScrollPane jsp = new JScrollPane(list);
+		jsp.setBounds(333, 32, 100, 187);
+		getContentPane().add(jsp);
+
+		final JButton addButton = new JButton();
+		addButton.setText("add");
+		addButton.setBounds(158, 255, 99, 23);
+		getContentPane().add(addButton);
+		addButton.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				mm.addElement(textField.getText());
+				textField.setText("");
+			}
+			
+		});
+
+		textField = new JTextField();
+		textField.setBounds(158, 198, 90, 21);
+		getContentPane().add(textField);
+
+		final JButton addButton_1 = new JButton();
+		addButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mm.removeElement(textField.getText());
+				textField.setText("");
+			}
+		});
+		addButton_1.setText("del");
+		addButton_1.setBounds(267, 255, 99, 23);
+		getContentPane().add(addButton_1);
+	}
+	
+	class MyModel  extends AbstractListModel{//implements ListModel{
+		
+		private List datas = new ArrayList();
+		public void addElement(Object data){
+			
+			int index = datas.size();
+			datas.add(data);
+			fireIntervalAdded(this, index, index);
+		}
+		public MyModel(){
+			
+		}
+		public MyModel(List datas){
+			this.datas = datas;
+		}
+		
+
+		public Object getElementAt(int index) {
+			// TODO Auto-generated method stub
+			return datas.get(index);
+		}
+
+		public int getSize() {
+			// TODO Auto-generated method stub
+			return datas.size();
+		}
+		  public boolean removeElement(Object obj) {
+				int index = datas.indexOf(obj);
+				boolean rv = datas.remove(obj);
+				if (index >= 0) {
+				    fireIntervalRemoved(this, index, index);
+				}
+				return rv;
+		}
+
+		
+		
+	}
+
+
+}

@@ -1,0 +1,222 @@
+package com.goudan.view;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
+
+import com.goudan.data.User;
+import com.swtdesigner.SwingResourceManager;
+
+public class RegistFrame extends JFrame {
+	private JTextField textField_3;
+	private JTextField textField_2;
+	private JTextField textField_1;
+	private JComboBox comboBox;
+	private JPasswordField passwordField_1;
+	private JPasswordField passwordField;
+	private JTextField textField;
+	
+	public RegistFrame() {
+		super();
+		getContentPane().setLayout(null);
+
+		final JLabel label = new JLabel();
+		label.setText("用   户   名：");
+		label.setBounds(130, 21, 97, 15);
+		getContentPane().add(label);
+
+		textField = new JTextField();
+		textField.setBounds(257, 18, 192, 21);
+		getContentPane().add(textField);
+
+		final JLabel label_2 = new JLabel();
+		label_2.setText("密        码：");
+		label_2.setBounds(130, 62, 97, 15);
+		getContentPane().add(label_2);
+
+		final JLabel label_3 = new JLabel();
+		label_3.setText("确认输入密码：");
+		label_3.setBounds(130, 102, 111, 21);
+		getContentPane().add(label_3);
+
+		passwordField = new JPasswordField();
+		passwordField.setBounds(257, 59, 192, 21);
+		getContentPane().add(passwordField);
+
+		passwordField_1 = new JPasswordField();
+		passwordField_1.setBounds(257, 102, 192, 21);
+		getContentPane().add(passwordField_1);
+
+		final JLabel label_4 = new JLabel();
+		label_4.setText("性  别：");
+		label_4.setBounds(130, 141, 64, 15);
+		getContentPane().add(label_4);
+		ButtonGroup bg = new ButtonGroup();
+		
+		final JRadioButton man = new JRadioButton();
+		man.setSelected(true);
+		man.setText("男");
+		man.setBounds(257, 137, 54, 23);
+		getContentPane().add(man);
+
+		final JRadioButton woman = new JRadioButton();
+		woman.setText("女");
+		woman.setBounds(337, 137, 54, 23);
+		getContentPane().add(woman);
+		bg.add(man);
+		bg.add(woman);
+		final JLabel label_5 = new JLabel();
+		label_5.setText("头  像：");
+		label_5.setBounds(130, 185, 64, 15);
+		getContentPane().add(label_5);
+		
+		DefaultComboBoxModel comModel = new DefaultComboBoxModel();
+		File file = new File("images1");
+		String[] names = file.list();
+		for (String name : names) {
+			comModel.addElement("images1\\" + name);
+		}
+		comboBox = new JComboBox(comModel);
+		ListCellRenderer aRenderer = new ListCellRenderer(){
+
+			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				// TODO Auto-generated method stub
+				JLabel icon = new JLabel();
+				ImageIcon ic = new ImageIcon(value + "");
+				icon.setIcon(ic);
+				return icon;
+			}
+			
+		};
+		comboBox.setRenderer( aRenderer);
+		comboBox.setBounds(255, 170, 119, 48);
+		getContentPane().add(comboBox);
+
+		final JLabel label_6 = new JLabel();
+		label_6.setText("年  龄：");
+		label_6.setBounds(130, 235, 60, 15);
+		getContentPane().add(label_6);
+
+		textField_1 = new JTextField();
+		textField_1.setBounds(257, 236, 95, 21);
+		getContentPane().add(textField_1);
+
+		final JLabel label_7 = new JLabel();
+		label_7.setText("邮  箱：");
+		label_7.setBounds(130, 275, 60, 15);
+		getContentPane().add(label_7);
+
+		textField_2 = new JTextField();
+		textField_2.setBounds(257, 275, 192, 21);
+		getContentPane().add(textField_2);
+
+		final JLabel label_8 = new JLabel();
+		label_8.setText("手  机：");
+		label_8.setBounds(130, 320, 60, 15);
+		getContentPane().add(label_8);
+
+		textField_3 = new JTextField();
+		textField_3.setBounds(255, 317, 142, 21);
+		getContentPane().add(textField_3);
+
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String name = textField.getText().trim();
+				String pass = passwordField.getText().trim();
+				String pass1 = passwordField_1.getText().trim();
+				String sex = "女";
+				if (man.isSelected()) {
+					sex = "男";
+				}
+				String icon = comboBox.getSelectedItem() + "";
+				int age = Integer.parseInt(textField_1.getText());
+				String email = textField_2.getText();
+				String phone = textField_3.getText();
+				
+				User user = new User();
+				user.setAge(age);
+				user.setEmail(email);
+				user.setIcon(icon);
+				user.setName(name);
+				user.setPass(pass);
+				user.setPhone(phone);
+				user.setSex(sex.charAt(0));
+					
+				if(name.equals("")){
+						JOptionPane.showMessageDialog(RegistFrame.this, "用户名不为空！");
+					}else if(pass.equals("")||pass1.equals("")){
+						JOptionPane.showMessageDialog(RegistFrame.this, "密码不为空！");
+					}else if(pass.equals(pass1)!=true){
+						JOptionPane.showMessageDialog(RegistFrame.this, "两次输入密码不一样！");
+						passwordField.setText("");
+						passwordField_1.setText("");
+					}
+
+				try {
+					Socket socket = new Socket("localhost",9527);
+					ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+					ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+					oos.writeObject(user);
+					oos.flush();
+					Object res = ois.readObject();
+					if (res.equals("success")) {
+						JOptionPane.showMessageDialog(RegistFrame.this, "注册成功");
+						RegistFrame.this.dispose();
+					} else {
+						JOptionPane.showMessageDialog(RegistFrame.this, "用户名已经存在");
+					}
+				} catch (UnknownHostException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException ee) {
+					// TODO Auto-generated catch block
+					ee.printStackTrace();
+				}
+				
+			}
+		});
+		button.setText("注册");
+		button.setBounds(199, 370, 99, 35);
+		getContentPane().add(button);
+
+		final JButton button_1 = new JButton();
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RegistFrame.this.dispose();
+			}
+		});
+		button_1.setText("取消");
+		button_1.setBounds(363, 370, 99, 35);
+		getContentPane().add(button_1);
+
+		final JLabel label_1 = new JLabel();
+		label_1.setIcon(SwingResourceManager.getIcon(RegistFrame.class, "/images/lt.jpg"));
+		label_1.setBounds(0, 0, 608, 477);
+		getContentPane().add(label_1);
+	}
+
+}

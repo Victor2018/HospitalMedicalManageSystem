@@ -1,0 +1,199 @@
+package com.goudan.ui;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+public class Chat extends JFrame {
+	private JList list;
+	private JTextField textField;
+	private JTextArea textArea;
+	private Socket socket;
+	private BufferedReader reader;
+	private PrintStream ps;
+	
+	private boolean isRun = true;
+	public Chat(Socket socket) {
+		super();
+		this.socket = socket;
+		try {
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			ps = new PrintStream(socket.getOutputStream());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowListener(){
+
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void windowClosing(WindowEvent e) {
+				// TODO Auto-generated method stub
+				int res = JOptionPane.showConfirmDialog(null, "是否真的退出？");
+			
+				if (res == 0) {
+					ps.println("exit");
+					isRun = false;
+					System.exit(0);
+				} else {
+					return ;
+				}
+
+
+				
+			}
+
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		textArea = new JTextArea();
+		textArea.setBackground(Color.YELLOW);
+		getContentPane().add(textArea, BorderLayout.CENTER);
+
+		final JPanel panel = new JPanel();
+		getContentPane().add(panel, BorderLayout.SOUTH);
+
+		textField = new JTextField();
+		final  CtClass cc = new CtClass();
+		textField.addKeyListener(new KeyListener(){
+
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.getKeyCode() == 17) {
+					cc.isCtl = true;
+				}
+				
+				if (e.getKeyCode() == 10 && cc.isCtl) {
+					String me = textField.getText();
+					ps.println(me);
+					ps.flush();
+					textField.setText("");
+				}
+			}
+
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				//System.out.println(e.getKeyCode());
+				if (e.getKeyCode() == 17) {
+					cc.isCtl = false;
+				}
+			}
+
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		textField.setColumns(40);
+		panel.add(textField);
+
+		final JButton sendButton = new JButton();
+		sendButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String me = textField.getText();
+				ps.println(me);
+				ps.flush();
+				textField.setText("");
+			}
+		});
+		sendButton.setText("send");
+		panel.add(sendButton);
+
+		final JButton exitButton = new JButton();
+		exitButton.setText("exit");
+		exitButton.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int res = JOptionPane.showConfirmDialog(null, "是否真的退出？");
+				System.out.println("re:::::::::::" + res );				
+				if (res == 0) {
+					ps.println("exit");
+					isRun = false;
+					System.exit(0);
+				} else {
+					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+					
+					return ;
+				}
+			}
+			
+		});
+		panel.add(exitButton);
+
+		list = new JList();
+		list.setBackground(Color.GREEN);
+		getContentPane().add(list, BorderLayout.EAST);
+		new ReThread().start();
+	}
+	public static void main(String[] a) throws UnknownHostException, IOException{
+		Socket socket = new Socket("localhost",5578);
+		Chat chat = new Chat(socket);
+		chat.setBounds(100, 100, 500, 500);
+		chat.setVisible(true);
+	}
+	private class CtClass{
+		public boolean isCtl;
+	}
+	class ReThread extends Thread{
+		public void run(){
+			while (isRun) {
+				try {
+					String mess = reader.readLine();
+					textArea.append(mess + "\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+}

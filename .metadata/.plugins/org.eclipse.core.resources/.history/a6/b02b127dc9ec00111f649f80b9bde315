@@ -1,0 +1,215 @@
+package com.goudan.ui;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataListener;
+
+import sun.misc.JavaLangAccess;
+
+public class ComTest extends JFrame {
+	
+	public static void main(String[] a) {
+		ComTest com = new ComTest();
+		com.setBounds(100, 100, 500, 400);
+		com.setVisible(true);
+		com.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	private JTextField textField;
+	private JList list;
+	class Data{
+		
+	}
+	public ComTest() {
+		super();
+		getContentPane().setLayout(null);
+		String[] data = {"one", "two", "three", "four", "two", "three", "four", "two", "three", "four", "two", "three", "four"};
+		final MyModel mm = new MyModel();
+		mm.addElement(new Frield("andy",new ImageIcon("images\\image12.png")));
+		mm.addElement(new Frield("jacky",new ImageIcon("images\\image13.png")));
+		mm.addElement(new Frield("lucy",new ImageIcon("images\\image4.png")));
+		mm.addElement(new Frield("lily",new ImageIcon("images\\image5.png")));
+		mm.addElement(new Frield("hanmm",new ImageIcon("images\\image6.png")));
+		list = new JList(mm);
+		list.addMouseListener(new MouseListener(){
+
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		list.setCellRenderer(new MyCellRenderer());
+		JScrollPane jsp = new JScrollPane(list);
+		jsp.setBounds(333, 32, 100, 187);
+		getContentPane().add(jsp);
+
+		final JButton addButton = new JButton();
+		addButton.setText("add");
+		addButton.setBounds(158, 255, 99, 23);
+		getContentPane().add(addButton);
+		addButton.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				mm.addElement(new Frield(textField.getText(),new ImageIcon("images\\image4.png")));
+				textField.setText("");
+			}
+			
+		});
+
+		textField = new JTextField();
+		textField.setBounds(158, 198, 90, 21);
+		getContentPane().add(textField);
+
+		final JButton addButton_1 = new JButton();
+		addButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mm.removeElement(new Frield(textField.getText(),null));
+				textField.setText("");
+			}
+		});
+		addButton_1.setText("del");
+		addButton_1.setBounds(267, 255, 99, 23);
+		getContentPane().add(addButton_1);
+	}
+	class MyCellRenderer extends JLabel implements ListCellRenderer {
+	     /*final  ImageIcon longIcon = new ImageIcon("images\\f016.gif");
+	     final  ImageIcon shortIcon = new ImageIcon("images\\f007.gif");
+	     {
+	    	 System.out.println(new File(".").getAbsolutePath());
+	     }*/
+	     // This is the only method defined by ListCellRenderer.
+	     // We just reconfigure the JLabel each time we're called.
+
+	     public Component getListCellRendererComponent(
+	       JList list,              // the list
+	       Object value,            // value to display
+	       int index,               // cell index
+	       boolean isSelected,      // is the cell selected
+	       boolean cellHasFocus)    // does the cell have focus
+	     {
+	         Frield f = (Frield)value;
+	        // System.out.println("cell:" + s);
+	         
+	         setText(f.name);
+	         setIcon(f.icon);
+	         if (isSelected) {
+	             setBackground(list.getSelectionBackground());
+	             setForeground(list.getSelectionForeground());
+	         } else {
+	             setBackground(list.getBackground());
+	             setForeground(list.getForeground());
+	         }
+	         setEnabled(list.isEnabled());
+	         setFont(list.getFont());
+	         setOpaque(true);
+	         return this;
+	     }
+	 }
+	
+	class Frield {
+		public String name;
+		public Icon icon;
+		
+		public Frield(String name,Icon icon){
+			this.name = name;
+			this.icon = icon;
+		}
+		
+		public int hashCode(){
+			return name.hashCode();
+		}
+		
+		public boolean equals(Object o){
+			if (o instanceof Frield) {
+				Frield f = (Frield)o;
+				return f.name.equals(this.name);
+			}
+			return false;
+		}
+	}
+
+
+	class MyModel  extends AbstractListModel{//implements ListModel{
+		
+		private List datas = new ArrayList();
+		public void addElement(Object data){
+			
+			int index = datas.size();
+			if (datas.contains(data)) {
+				return;
+			}
+			datas.add(data);
+			fireIntervalAdded(this, index, index);
+		}
+		public MyModel(){
+			
+		}
+		public MyModel(List datas){
+			this.datas = datas;
+		}
+		
+
+		public Object getElementAt(int index) {
+			// TODO Auto-generated method stub
+			return datas.get(index);
+		}
+
+		public int getSize() {
+			// TODO Auto-generated method stub
+			return datas.size();
+		}
+		  public boolean removeElement(Object obj) {
+				int index = datas.indexOf(obj);
+				boolean rv = datas.remove(obj);
+				if (index >= 0) {
+				    fireIntervalRemoved(this, index, index);
+				}
+				return rv;
+		}
+
+		
+		
+	}
+
+
+}
